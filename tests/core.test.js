@@ -71,8 +71,15 @@ describe("validateUserInput", () => {
     expect(validateUserInput("jo", 20)).toMatch(/invalid/i);
   });
 
+  it("should return error if username is longer than 256 characters", () => {
+    expect(validateUserInput("A".repeat(256), 20)).toMatch(/invalid/i);
+  });
+
   it("should return error if age is less than 18", () => {
     expect(validateUserInput("john", 10)).toMatch(/invalid/i);
+  });
+  it("should return error if age is greater than 100", () => {
+    expect(validateUserInput("john", 101)).toMatch(/invalid/i);
   });
 
   it("should return error if age is not a number", () => {
