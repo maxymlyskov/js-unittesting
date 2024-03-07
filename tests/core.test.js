@@ -85,4 +85,9 @@ describe("validateUserInput", () => {
   it("should return error if age is not a number", () => {
     expect(validateUserInput("john", "20")).toMatch(/invalid/i);
   });
+
+  it("should return an error if both values are invalid", () => {
+    expect(validateUserInput(0, "")).toMatch(/invalid username/i);
+    expect(validateUserInput(0, "")).toMatch(/invalid age/i);
+  });
 });
