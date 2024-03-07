@@ -23,4 +23,7 @@ describe('fizzBuzz', () => {
     it('should return Buzz if n is multiple of 5', () => {
         expect(fizzBuzz(10)).toBe('Buzz')
     })
+    it('should return arg as a string if n is not multiple of 5 or 3', () => {
+        expect(fizzBuzz(1)).toBe('1')
+    })
 })
