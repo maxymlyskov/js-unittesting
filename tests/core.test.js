@@ -5,6 +5,7 @@ import {
   validateUserInput,
   isPriceInRange,
   isValidUsername,
+  canDrive,
 } from "../src/core";
 
 describe("getCoupons", () => {
@@ -134,5 +135,23 @@ describe("isValidUsername", () => {
     expect(isValidUsername(null)).toBe(false);
     expect(isValidUsername(undefined)).toBe(false);
     expect(isValidUsername(123)).toBe(false);
+  });
+});
+
+describe("canDrive", () => {
+  it("should return error if given wrong country code", () => {
+    expect(canDrive(20, "INVALID")).toMatch(/invalid/i);
+  });
+  it("should return true if given right age and country code", () => {
+    expect(canDrive(16, "US")).toBe(true);
+    expect(canDrive(17, "UK")).toBe(true);
+  });
+  it("should return false if given age less than it should", () => {
+    expect(canDrive(15, "US")).toBe(false);
+    expect(canDrive(16, "UK")).toBe(false);
+  });
+  it("should return true if given age that is equal to requirement", () => {
+    expect(canDrive(16, "US")).toBe(true);
+    expect(canDrive(17, "UK")).toBe(true);
   });
 });
