@@ -6,6 +6,7 @@ import {
   isPriceInRange,
   isValidUsername,
   canDrive,
+  fetchData,
 } from "../src/core";
 
 describe("getCoupons", () => {
@@ -155,4 +156,12 @@ describe("canDrive", () => {
       expect(canDrive(age, countryCode)).toBe(result);
     }
   );
+});
+
+describe("fetchData", () => {
+  it("should return a promise that is resolved to array with more than 1 element", async () => {
+    const result = await fetchData();
+    expect(Array.isArray(result)).toBeTruthy();
+    expect(result.length).toBeGreaterThan(1);
+  });
 });
