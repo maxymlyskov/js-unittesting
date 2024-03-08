@@ -100,16 +100,14 @@ describe("validateUserInput", () => {
 });
 
 describe("isPriceInRange", () => {
-  it("should return false if price is not in a range", () => {
-    expect(isPriceInRange(10, 20, 30)).toBe(false);
-    expect(isPriceInRange(100, 20, 30)).toBe(false);
-  });
-  it("should return true if price is equal to min or max of a range", () => {
-    expect(isPriceInRange(5, 5, 30)).toBe(true);
-    expect(isPriceInRange(30, 5, 30)).toBe(true);
-  });
-  it("should return true if price is withing a range", () => {
-    expect(isPriceInRange(20, 20, 30)).toBe(true);
+  it.each([
+    { price: -10, result: false, scenario: "less than min" },
+    { price: 0, result: true, scenario: "equal to min" },
+    { price: 20, result: true, scenario: "greater than min" },
+    { price: 100, result: true, scenario: "equal to max" },
+    { price: 120, result: false, scenario: "greater then max" },
+  ])("should return $result if price is $scenario", ({ price, result }) => {
+    expect(isPriceInRange(price, 0, 100)).toBe(result);
   });
 });
 
@@ -142,16 +140,19 @@ describe("canDrive", () => {
   it("should return error if given wrong country code", () => {
     expect(canDrive(20, "INVALID")).toMatch(/invalid/i);
   });
-  it("should return true if given right age and country code", () => {
-    expect(canDrive(16, "US")).toBe(true);
-    expect(canDrive(17, "UK")).toBe(true);
-  });
-  it("should return false if given age less than it should", () => {
-    expect(canDrive(15, "US")).toBe(false);
-    expect(canDrive(16, "UK")).toBe(false);
-  });
-  it("should return true if given age that is equal to requirement", () => {
-    expect(canDrive(16, "US")).toBe(true);
-    expect(canDrive(17, "UK")).toBe(true);
-  });
+  it.each([
+    [
+      { age: 15, countryCode: "US", result: false },
+      { age: 16, countryCode: "US", result: true },
+      { age: 17, countryCode: "US", result: true },
+      { age: 16, countryCode: "UK", result: false },
+      { age: 17, countryCode: "UK", result: true },
+      { age: 18, countryCode: "UK", result: true },
+    ],
+  ])(
+    "should return $result if age is $age and country code is $countryCode",
+    ({ age, countryCode, result }) => {
+      expect(canDrive(age, countryCode)).toBe(result);
+    }
+  );
 });
