@@ -1,4 +1,4 @@
-import { it, expect, describe } from "vitest";
+import { it, expect, describe, beforeEach } from "vitest";
 import {
   getCoupons,
   calculateDiscount,
@@ -7,6 +7,7 @@ import {
   isValidUsername,
   canDrive,
   fetchData,
+  Stack,
 } from "../src/core";
 
 describe("getCoupons", () => {
@@ -123,12 +124,12 @@ describe("isValidUsername", () => {
     expect(isValidUsername("A".repeat(maxLength + 1))).toBe(false);
   });
   it("should return true if username has less than 15 and more than 5 characters", () => {
-    expect(isValidUsername("A".repeat(maxLength))).toBe(true);
-    expect(isValidUsername("A".repeat(minLength))).toBe(true);
+    expect(isValidUsername("A".repeat(maxLength))).toBeTruthy();
+    expect(isValidUsername("A".repeat(minLength))).toBeTruthy();
   });
   it("should return true if username is within the length constraint", () => {
-    expect(isValidUsername("A".repeat(maxLength - 1))).toBe(true);
-    expect(isValidUsername("A".repeat(minLength + 1))).toBe(true);
+    expect(isValidUsername("A".repeat(maxLength - 1))).toBeTruthy();
+    expect(isValidUsername("A".repeat(minLength + 1))).toBeTruthy();
   });
   it("should return false for invalid input type", () => {
     expect(isValidUsername(null)).toBe(false);
@@ -163,5 +164,62 @@ describe("fetchData", () => {
     const result = await fetchData();
     expect(Array.isArray(result)).toBeTruthy();
     expect(result.length).toBeGreaterThan(1);
+  });
+});
+
+describe("Stack", () => {
+  let stack;
+  beforeEach(() => {
+    stack = new Stack();
+  });
+  it("push should add item to the stack", () => {
+    stack.push(1);
+
+    expect(stack.size()).toBe(1);
+  });
+  it("pop should  remove last item from the stack and return it", () => {
+    stack.push(1);
+    stack.push(2);
+
+    const poppedItem = stack.pop();
+
+    expect(poppedItem).toBe(2);
+    expect(stack.size()).toBe(1);
+  });
+
+  it("pop should trhow an error if stack is empty", () => {
+    expect(() => stack.pop()).toThrowError(/empty/i);
+  });
+
+  it("peek should return the last item from the stack without removing it", () => {
+    stack.push(1);
+    stack.push(2);
+    const pickedItem = stack.peek();
+    expect(pickedItem).toBe(2);
+    expect(stack.size()).toBe(2);
+  });
+
+  it("peek should throw an error on empty stack", () => {
+    expect(() => stack.peek()).toThrowError(/empty/i);
+  });
+
+  it("isEmpty should return true if stack is empty", () => {
+    expect(stack.isEmpty()).toBeTruthy();
+  });
+  it("isEmpty should return false if stack is not empty", () => {
+    stack.push(1);
+    expect(stack.isEmpty()).toBeFalsy();
+  });
+
+  it("size should return the number of items in the stack", () => {
+    stack.push(1);
+    stack.push(2);
+    expect(stack.size()).toBe(2);
+  });
+
+  it("clear should remove all items from the stack", () => {
+    stack.push(1);
+    stack.clear();
+    expect(stack.isEmpty()).toBeTruthy();
   });
 });
