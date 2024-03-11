@@ -3,14 +3,26 @@ import {
   getPriceInCurrency,
   getShippingInfo,
   renderPage,
+  signUp,
+  submitOrder,
 } from "../src/mocking";
 import { getExchangeRate } from "../src/libs/currency";
 import { getShippingQuote } from "../src/libs/shipping";
 import { trackPageView } from "../src/libs/analytics";
+import { charge } from "../src/libs/payment";
+import { sendEmail } from "../src/libs/email";
 
 vi.mock("../src/libs/currency");
 vi.mock("../src/libs/shipping");
 vi.mock("../src/libs/analytics");
+vi.mock("../src/libs/payment");
+vi.mock("../src/libs/email", async (importOriginal) => {
+  const originModule = await importOriginal();
+  return {
+    ...originModule,
+    sendEmail: vi.fn(),
+  };
+});
 
 describe("test suite", () => {
   it("sendText", () => {
@@ -60,5 +72,50 @@ describe("renderPage", () => {
     await renderPage();
 
     expect(trackPageView).toHaveBeenCalledWith("/home");
+  });
+});
+
+describe("submitOrder", () => {
+  const creditCard = { creditCardNumber: "123" };
+  const order = { totalAmount: 100 };
+
+  it("should return success status", async () => {
+    vi.mocked(charge).mockResolvedValue({ status: "success" });
+    const result = await submitOrder(order, creditCard);
+    expect(result).toEqual({ success: true });
+  });
+
+  it("should return error status", async () => {
+    vi.mocked(charge).mockResolvedValue({ status: "failed" });
+    const result = await submitOrder(order, creditCard);
+    expect(result).toEqual({ success: false, error: "payment_error" });
+  });
+
+  it("should charge correct amount", async () => {
+    vi.mocked(charge).mockResolvedValue({ status: "success" });
+    await submitOrder(order, creditCard);
+
+    expect(charge).toHaveBeenCalledWith(creditCard, order.totalAmount);
+  });
+});
+
+describe("signUp", () => {
+  const email = "test@domain.com";
+
+  it("should return false if email is not valid", async () => {
+    const result = await signUp("invalid-email");
+    expect(result).toBeFalsy();
+  });
+  it("should return true if email is valid", async () => {
+    const result = await signUp(email);
+    expect(result).toBeTruthy();
+  });
+  it("should send welocme email if email is valid", async () => {
+    await signUp(email);
+
+    expect(sendEmail).toHaveBeenCalled();
+    const args = vi.mocked(sendEmail).mock.calls[0];
+    expect(args[0]).toBe(email);
+    expect(args[1]).toMatch(/welcome/i);
   });
 });
