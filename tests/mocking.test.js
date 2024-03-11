@@ -1,4 +1,10 @@
-import { it, expect, describe, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { trackPageView } from '../src/libs/analytics';
+import { getExchangeRate } from '../src/libs/currency';
+import { sendEmail } from '../src/libs/email';
+import { charge } from '../src/libs/payment';
+import security from '../src/libs/security';
+import { getShippingQuote } from '../src/libs/shipping';
 import {
   getDiscount,
   getPriceInCurrency,
@@ -9,12 +15,6 @@ import {
   signUp,
   submitOrder,
 } from '../src/mocking';
-import { getExchangeRate } from '../src/libs/currency';
-import { getShippingQuote } from '../src/libs/shipping';
-import { trackPageView } from '../src/libs/analytics';
-import { charge } from '../src/libs/payment';
-import { sendEmail } from '../src/libs/email';
-import security from '../src/libs/security';
 
 vi.mock('../src/libs/currency');
 vi.mock('../src/libs/shipping');
