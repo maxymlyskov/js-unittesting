@@ -1,8 +1,10 @@
 import { it, expect, describe, vi } from "vitest";
-import { getPriceInCurrency } from "../src/mocking";
+import { getPriceInCurrency, getShippingInfo } from "../src/mocking";
 import { getExchangeRate } from "../src/libs/currency";
+import { getShippingQuote } from "../src/libs/shipping";
 
 vi.mock("../src/libs/currency");
+vi.mock("../src/libs/shipping");
 
 describe("test suite", () => {
   it("sendText", () => {
@@ -23,5 +25,20 @@ describe("getPriceInCurrency", () => {
     const price = getPriceInCurrency(10, "AUD");
 
     expect(price).toBe(15);
+  });
+});
+
+describe("getShippingInfo", () => {
+  it("should return error message if shipping is unavailiable", () => {
+    vi.mocked(getShippingQuote).mockReturnValue(null);
+    const result = getShippingInfo("US");
+    expect(result).toMatch(/unavailable/i);
+  });
+
+  it("should return cost for exact destination", () => {
+    vi.mocked(getShippingQuote).mockReturnValue({ cost: 10, estimatedDays: 2 });
+    const result = getShippingInfo("US");
+
+    expect(result).toMatch(/shipping cost: \$10 \(2 days\)/i);
   });
 });
