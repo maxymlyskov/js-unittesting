@@ -1,10 +1,16 @@
 import { it, expect, describe, vi } from "vitest";
-import { getPriceInCurrency, getShippingInfo } from "../src/mocking";
+import {
+  getPriceInCurrency,
+  getShippingInfo,
+  renderPage,
+} from "../src/mocking";
 import { getExchangeRate } from "../src/libs/currency";
 import { getShippingQuote } from "../src/libs/shipping";
+import { trackPageView } from "../src/libs/analytics";
 
 vi.mock("../src/libs/currency");
 vi.mock("../src/libs/shipping");
+vi.mock("../src/libs/analytics");
 
 describe("test suite", () => {
   it("sendText", () => {
@@ -40,5 +46,19 @@ describe("getShippingInfo", () => {
     const result = getShippingInfo("US");
 
     expect(result).toMatch(/shipping cost: \$10 \(2 days\)/i);
+  });
+});
+
+describe("renderPage", () => {
+  it("should render corrent content", async () => {
+    const result = await renderPage();
+
+    expect(result).toMatch(/content/i);
+  });
+
+  it("should track page view", async () => {
+    await renderPage();
+
+    expect(trackPageView).toHaveBeenCalledWith("/home");
   });
 });
