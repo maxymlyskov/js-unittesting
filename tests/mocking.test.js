@@ -1,7 +1,8 @@
-import { it, expect, describe, vi } from "vitest";
+import { it, expect, describe, vi, beforeEach } from "vitest";
 import {
   getPriceInCurrency,
   getShippingInfo,
+  isOnline,
   login,
   renderPage,
   signUp,
@@ -115,7 +116,7 @@ describe("signUp", () => {
   it("should send welocme email if email is valid", async () => {
     await signUp(email);
 
-    expect(sendEmail).toHaveBeenCalled();
+    expect(sendEmail).toHaveBeenCalledOnce();
     const args = vi.mocked(sendEmail).mock.calls[0];
     expect(args[0]).toBe(email);
     expect(args[1]).toMatch(/welcome/i);
@@ -130,5 +131,22 @@ describe("login", () => {
 
     const securityCode = spy.mock.results[0].value.toString();
     expect(sendEmail).toHaveBeenCalledWith(email, securityCode);
+  });
+});
+
+describe("isOnline", () => {
+  it("should return false if current time is outside available hours", () => {
+    vi.setSystemTime(new Date("2024-01-01 07:59:00"));
+    expect(isOnline()).toBeFalsy();
+
+    vi.setSystemTime(new Date("2024-01-01 20:01:00"));
+    expect(isOnline()).toBeFalsy();
+  });
+  it("should return true if current hour is withing opening hours", () => {
+    vi.setSystemTime(new Date("2024-01-01 8:00:00"));
+    expect(isOnline()).toBeTruthy();
+
+    vi.setSystemTime(new Date("2024-01-01 19:59:00"));
+    expect(isOnline()).toBeTruthy();
   });
 });
